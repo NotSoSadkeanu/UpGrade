@@ -1,11 +1,12 @@
 import java.util.Scanner;
 
 public class Main {
+    private static boolean[] done = new boolean[100];
+    private static String[] tasks = new String[100];
+    private static Scanner scanner = new Scanner(System.in);
+    private static int tasksCounter = 0;
+
     static void main(String[] args) {
-        boolean[] done = new boolean[100];
-        String[] tasks = new String[100];
-        Scanner scanner = new Scanner(System.in);
-        int tasksCounter = 0;
         while (true) {
             menuShow();
             String input = scanner.nextLine();
@@ -19,16 +20,16 @@ public class Main {
             }
             switch (number) {
                 case 1:
-                    tasksCounter = tasksAdd(tasks, tasksCounter, done, scanner);
+                    tasksCounter = tasksAdd(tasksCounter);
                     break;
                 case 2:
-                    showTasks(tasks, tasksCounter, done);
+                    showTasks(tasksCounter);
                     break;
                 case 3:
-                    tasksCounter = tasksRemove(scanner, tasksCounter, done, tasks);
+                    tasksCounter = tasksRemove(tasksCounter);
                     break;
                 case 4:
-                    done(tasks, tasksCounter, done, scanner);
+                    done(tasksCounter);
                     break;
                 case 0:
                     return;
@@ -40,7 +41,7 @@ public class Main {
         }
     }
 
-    static void menuShow() {
+    private static void menuShow() {
         System.out.println("""
                 Это планировщик задач. Введите число, чтобы попасть в нужный раздел меню.
                 >>> Меню:
@@ -53,34 +54,34 @@ public class Main {
                 Выберите пункт меню:""");
     }
 
-    static void showTasks(String[] tasks, int tasksCounter, boolean[] done) {
+    private static void showTasks(int tasksCounter) {
         if (tasksCounter == 0) {
             System.out.println("Список задач пуст");
-        } else {
-            for (int i = 0; i < tasksCounter; i++) {
-                String status = done[i] ? "[X]" : "[ ]";
-                System.out.println((i + 1) + ". " + status + " " + tasks[i]);
-            }
+            return;
+        }
+        System.out.println("Список задач:");
+        for (int i = 0; i < tasksCounter; i++) {
+            String status = Main.done[i] ? "[X]" : "[ ]";
+            System.out.println((i + 1) + ". " + status + " " + Main.tasks[i]);
         }
     }
 
-    static int tasksAdd(String[] tasks, int tasksCounter, boolean[] done, Scanner scanner) {
-        if (tasksCounter >= tasks.length) {
+    private static int tasksAdd(int tasksCounter) {
+        if (tasksCounter >= Main.tasks.length) {
             System.out.println("Список задач переполнен!");
             return tasksCounter;
-        } else {
-            System.out.println("Введите описание задачи: ");
-            String task = scanner.nextLine();
-            tasks[tasksCounter] = task;
-            done[tasksCounter] = false;
-            System.out.println("Задача добавлена!");
-            return tasksCounter + 1;
         }
+        System.out.println("Введите описание задачи: ");
+        String task = Main.scanner.nextLine();
+        Main.tasks[tasksCounter] = task;
+        Main.done[tasksCounter] = false;
+        System.out.println("Задача добавлена!");
+        return tasksCounter + 1;
     }
 
-    static int tasksRemove(Scanner scanner, int tasksCounter, boolean[] done, String[] tasks) {
+    private static int tasksRemove(int tasksCounter) {
         System.out.print("Введите номер задачи: ");
-        String input = scanner.nextLine();
+        String input = Main.scanner.nextLine();
         try {
             int number = Integer.parseInt(input);
             if (number < 1 || number > tasksCounter) {
@@ -88,23 +89,23 @@ public class Main {
                 return tasksCounter;
             }
             int index = number - 1;
-            System.out.println("Задача \"" + tasks[index] + "\" удалена!");
+            System.out.println("Задача \"" + Main.tasks[index] + "\" удалена!");
             for (int i = index; i < tasksCounter - 1; i++) {
-                tasks[i] = tasks[i + 1];
-                done[i] = done[i + 1];
+                Main.tasks[i] = Main.tasks[i + 1];
+                Main.done[i] = Main.done[i + 1];
             }
-            tasks[tasksCounter - 1] = null;
-            done[tasksCounter - 1] = false;
+            Main.tasks[tasksCounter - 1] = null;
+            Main.done[tasksCounter - 1] = false;
             tasksCounter--;
         } catch (NumberFormatException e) {
-            System.out.println("Ошибка ввода! Выберите число, соттветствующее номеру задачи");
+            System.out.println("Ошибка ввода! Выберите число, соответствующее номеру задачи");
         }
         return tasksCounter;
     }
 
-    static void done(String[] tasks, int tasksCounter, boolean[] done, Scanner scanner) {
+    private static void done(int tasksCounter) {
         System.out.println("Введите номер задачи для отметки: ");
-        String input = scanner.nextLine();
+        String input = Main.scanner.nextLine();
         try {
             int number = Integer.parseInt(input);
             if (number < 1 || number > tasksCounter) {
@@ -112,15 +113,15 @@ public class Main {
                 return;
             }
             int index = number - 1;
-            if (done[index]) {
-            System.out.println("Задача \"" + tasks[index] + "\" уже была выполнена!");
+            if (Main.done[index]) {
+                System.out.println("Задача \"" + Main.tasks[index] + "\" уже была выполнена!");
             } else {
-            done[index] = true;
-            System.out.println("Задача \"" + tasks[index] + "\" отмечена как выполненная!");
-        }
+                Main.done[index] = true;
+                System.out.println("Задача \"" + Main.tasks[index] + "\" отмечена как выполненная!");
+            }
 
-    } catch (NumberFormatException e) {
-        System.out.println("Ошибка ввода! Введите число, соответствующее номеру задачи");
+        } catch (NumberFormatException e) {
+            System.out.println("Ошибка ввода! Введите число, соответствующее номеру задачи");
         }
     }
 }
