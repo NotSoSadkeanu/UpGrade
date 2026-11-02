@@ -1,9 +1,11 @@
-package impl;
+package impl.service;
 
+import impl.model.Task;
+import impl.model.Priority;
 import java.time.LocalDate;
 
 public interface TaskHandler {
-    Task addTask(String name, String description, Task.Priority priority, LocalDate deadline);
+    Task addTask(String name, String description, Priority priority, LocalDate deadline);
 
     int getTaskCount();
 

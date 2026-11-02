@@ -1,8 +1,14 @@
-package impl;
+package impl.service;
+
+import impl.util.TaskPrinter;
+import impl.model.Priority;
 
 import java.time.LocalDate;
 import java.util.Scanner;
 import java.time.format.DateTimeParseException;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.IntStream;
 
 public class TaskManager {
     private final Scanner scanner = new Scanner(System.in);
@@ -46,33 +52,27 @@ public class TaskManager {
     private void tasksAdd() {
         TaskPrinter.printTaskAddGreeting();
         String task = scanner.nextLine();
+
         TaskPrinter.printTaskPriorityGreeting();
-        Task.Priority priorityEnum;
-        while (true) {
-            String priority = scanner.nextLine();
-            try {
-                priorityEnum = Task.Priority.valueOf(priority.toUpperCase());
-                break;
-            } catch (IllegalArgumentException e) {
-                TaskPrinter.printTaskPriorityInputError();
-            }
-        }
+        Priority priorityEnum = readInputFromUser(
+                input -> Priority.valueOf(input.toUpperCase()),
+                e -> e instanceof IllegalArgumentException,
+                TaskPrinter::printTaskPriorityInputError
+        );
+
         TaskPrinter.printTaskDeadlineGreeting();
-        String deadlineInput;
-        LocalDate deadline;
-        while (true) {
-            deadlineInput = scanner.nextLine();
-            try {
-                deadline = LocalDate.parse(deadlineInput);
-                break;
-            } catch (DateTimeParseException e) {
-                TaskPrinter.printTaskDeadlineInputError();
-            }
-        }
+        LocalDate deadline = readInputFromUser(
+                LocalDate::parse,
+                e -> e instanceof DateTimeParseException,
+                TaskPrinter::printTaskDeadlineInputError
+        );
+
         TaskPrinter.printTaskDescriptionGreeting();
         String description = scanner.nextLine();
+
         taskHandler.addTask(task, description, priorityEnum, deadline);
         TaskPrinter.printTaskAddition();
+
     }
 
     private void showTasks() {
@@ -81,10 +81,11 @@ public class TaskManager {
             return;
         }
         TaskPrinter.printTasks();
-        for (int i = 0; i < taskHandler.getTaskCount(); i++) {
-            Task task = taskHandler.getTaskAt(i);
-            TaskPrinter.printTask(i + 1, task);
-        }
+        IntStream.range(0, taskHandler.getTaskCount())
+                .forEach(i -> TaskPrinter.printTask(
+                        i + 1,
+                        taskHandler.getTaskAt(i)
+                ));
     }
 
     private void tasksRemove() {
@@ -126,6 +127,24 @@ public class TaskManager {
 
         } catch (NumberFormatException e) {
             TaskPrinter.printNumberFormatExceptionError();
+        }
+
+
+    }
+
+    private <T> T readInputFromUser(Function<String, T> parser, Predicate<RuntimeException> invalidInput, Runnable errorPrint) {
+        while (true) {
+            String input = scanner.nextLine();
+            try {
+                return parser.apply(input);
+            } catch (RuntimeException e) {
+                if (invalidInput.test(e)) {
+                    errorPrint.run();
+                    continue;
+                }
+                throw e;
+
+            }
         }
     }
 
