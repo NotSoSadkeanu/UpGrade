@@ -1,4 +1,4 @@
-package impl;
+package impl.model;
 
 import java.time.LocalDate;
 
@@ -60,13 +60,6 @@ public class Task {
 
     public void setDone(boolean done) {
         this.done = done;
-    }
-
-    public enum Priority {
-        LOW,
-        MEDIUM,
-        HIGH,
-        URGENT
     }
 
 }

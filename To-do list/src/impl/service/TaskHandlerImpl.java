@@ -1,4 +1,7 @@
-package impl;
+package impl.service;
+
+import impl.model.Task;
+import impl.model.Priority;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -13,7 +16,7 @@ public class TaskHandlerImpl implements TaskHandler {
     }
 
     @Override
-    public Task addTask(String name, String description, Task.Priority priority, LocalDate deadline) {
+    public Task addTask(String name, String description, Priority priority, LocalDate deadline) {
         Task task = new Task(idCounter, name, description, priority, deadline);
         tasks.add(task);
         idCounter++;

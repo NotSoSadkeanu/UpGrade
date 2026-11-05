@@ -1,4 +1,6 @@
-package impl;
+package impl.util;
+
+import impl.model.Task;
 
 public final class TaskPrinter {
     private TaskPrinter() {
