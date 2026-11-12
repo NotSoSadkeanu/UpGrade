@@ -24,6 +24,22 @@ public final class TaskPrinter {
                 Выберите пункт меню:""");
     }
 
+    public static void printStorageStrategyChoice() {
+        System.out.println("""
+                Выберите место хранения задач:
+                1. В оперативной памяти
+                2. В базе данных
+                """);
+    }
+
+    public static void printUserName() {
+        System.out.println("Введите имя пользователя: ");
+    }
+
+    public static void printInvalidStorageStrategy() {
+        System.out.println("Некорректный выбор!");
+    }
+
     public static void printTaskAddGreeting() {
         System.out.println("Введите название задачи: ");
     }
@@ -43,7 +59,6 @@ public final class TaskPrinter {
     public static void printNumberFormatExceptionError() {
         System.out.println("Ошибка ввода! Выберите число, соответствующее номеру задачи");
     }
-
 
     public static void printEmptyList() {
         System.out.println("Список задач пуст");
@@ -98,4 +113,19 @@ public final class TaskPrinter {
         System.out.println("Введите описание задачи: ");
     }
 
+    public static void printTaskSaveDatabaseError() {
+        System.out.println("Не удалось сохранить задачу. Проверьте подключение к базе данных.");
+    }
+
+    public static void printTasksLoadDatabaseError() {
+        System.out.println("Не удалось получить список задач. Проверьте подключение к базе данных.");
+    }
+
+    public static void printTaskRemoveDatabaseError() {
+        System.out.println("Не удалось удалить задачу. Проверьте подключение к базе данных.");
+    }
+
+    public static void printTaskDoneDatabaseError() {
+        System.out.println("Не удалось изменить статус задачи. Проверьте подключение к базе данных.");
+    }
 }
