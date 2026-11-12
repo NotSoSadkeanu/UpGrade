@@ -7,11 +7,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TaskHandlerImpl implements TaskHandler {
+public class InMemoryTaskHandler implements TaskHandler {
     private final List<Task> tasks;
     private int idCounter = 1;
 
-    public TaskHandlerImpl() {
+    public InMemoryTaskHandler() {
         this.tasks = new ArrayList<>();
     }
 
@@ -29,31 +29,32 @@ public class TaskHandlerImpl implements TaskHandler {
     }
 
     @Override
-    public Task getTaskAt(int index) {
-        return tasks.get(index);
-    }
+    public boolean markTaskDone(int taskId) {
+        Task task = tasks.stream()
+                .filter(t -> t.getId() == taskId)
+                .findFirst()
+                .orElse(null);
 
-    @Override
-    public boolean markTaskDone(int index) {
-        if (index < 0 || index >= tasks.size()) {
+        if (task == null || task.isDone()) {
             return false;
         }
-        Task task = tasks.get(index);
-        if (tasks.get(index).isDone()) {
-            return false;
-        }
+
         task.setDone(true);
         return true;
-
     }
 
     @Override
-    public boolean removeTask(int index) {
-        if (index < 0 || index >= tasks.size()) {
-            return false;
-        }
-        tasks.remove(index);
-        return true;
+    public boolean removeTask(int taskId) {
+        Task taskToRemove = tasks.stream()
+                .filter(task -> task.getId() == taskId)
+                .findFirst()
+                .orElse(null);
+
+        return taskToRemove != null && tasks.remove(taskToRemove);
     }
 
+    @Override
+    public List<Task> getTasks() {
+        return tasks.stream().toList();
+    }
 }

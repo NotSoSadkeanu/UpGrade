@@ -1,5 +1,6 @@
 package impl.service;
 
+import impl.model.Task;
 import impl.util.TaskPrinter;
 import impl.model.Priority;
 
@@ -9,10 +10,25 @@ import java.time.format.DateTimeParseException;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
+import java.sql.SQLException;
+import java.util.List;
 
 public class TaskManager {
-    private final Scanner scanner = new Scanner(System.in);
-    private final TaskHandler taskHandler = new TaskHandlerImpl();
+    private final Scanner scanner;
+    private final TaskHandler taskHandler;
+
+    public TaskManager() {
+        this(new InMemoryTaskHandler(), new Scanner(System.in));
+    }
+
+    public TaskManager(TaskHandler taskHandler) {
+        this(taskHandler, new Scanner(System.in));
+    }
+
+    public TaskManager(TaskHandler taskHandler, Scanner scanner) {
+        this.taskHandler = taskHandler;
+        this.scanner = scanner;
+    }
 
     public void start() {
         while (true) {
@@ -44,7 +60,6 @@ public class TaskManager {
                 default:
                     TaskPrinter.printDefaultError();
                     break;
-
             }
         }
     }
@@ -59,7 +74,6 @@ public class TaskManager {
                 e -> e instanceof IllegalArgumentException,
                 TaskPrinter::printTaskPriorityInputError
         );
-
         TaskPrinter.printTaskDeadlineGreeting();
         LocalDate deadline = readInputFromUser(
                 LocalDate::parse,
@@ -70,22 +84,30 @@ public class TaskManager {
         TaskPrinter.printTaskDescriptionGreeting();
         String description = scanner.nextLine();
 
-        taskHandler.addTask(task, description, priorityEnum, deadline);
-        TaskPrinter.printTaskAddition();
-
+        try {
+            taskHandler.addTask(task, description, priorityEnum, deadline);
+            TaskPrinter.printTaskAddition();
+        } catch (SQLException e) {
+            TaskPrinter.printTaskSaveDatabaseError();
+        }
     }
 
     private void showTasks() {
-        if (taskHandler.getTaskCount() == 0) {
-            TaskPrinter.printEmptyList();
-            return;
+        try {
+            List<Task> tasks = taskHandler.getTasks();
+
+            if (tasks.isEmpty()) {
+                TaskPrinter.printEmptyList();
+                return;
+            }
+            TaskPrinter.printTasks();
+            IntStream.range(0, tasks.size())
+                    .forEach(i -> TaskPrinter.printTask(
+                            i + 1, tasks.get(i)
+                    ));
+        } catch (SQLException e) {
+            TaskPrinter.printTasksLoadDatabaseError();
         }
-        TaskPrinter.printTasks();
-        IntStream.range(0, taskHandler.getTaskCount())
-                .forEach(i -> TaskPrinter.printTask(
-                        i + 1,
-                        taskHandler.getTaskAt(i)
-                ));
     }
 
     private void tasksRemove() {
@@ -93,17 +115,21 @@ public class TaskManager {
         String input = scanner.nextLine();
         try {
             int number = Integer.parseInt(input);
-            if (number < 1 || number > taskHandler.getTaskCount()) {
+            List<Task> tasks = taskHandler.getTasks();
+            if (number < 1 || number > tasks.size()) {
                 TaskPrinter.printTaskInvalidNumber();
                 return;
             }
             int index = number - 1;
-            String task = taskHandler.getTaskAt(index).getName();
-            if (taskHandler.removeTask(index)) {
-                TaskPrinter.printTaskRemoved(task);
+            Task task = tasks.get(index);
+            String taskName = task.getName();
+            if (taskHandler.removeTask(task.getId())) {
+                TaskPrinter.printTaskRemoved(taskName);
             }
         } catch (NumberFormatException e) {
             TaskPrinter.printNumberFormatExceptionError();
+        } catch (SQLException e) {
+            TaskPrinter.printTaskRemoveDatabaseError();
         }
     }
 
@@ -112,24 +138,24 @@ public class TaskManager {
         String input = scanner.nextLine();
         try {
             int number = Integer.parseInt(input);
-            if (number < 1 || number > taskHandler.getTaskCount()) {
+            List<Task> tasks = taskHandler.getTasks();
+            if (number < 1 || number > tasks.size()) {
                 TaskPrinter.printTaskInvalidNumber();
                 return;
             }
             int index = number - 1;
-            String task = taskHandler.getTaskAt(index).getName();
-            if (taskHandler.markTaskDone(index)) {
-                TaskPrinter.printTaskDone(task);
+            Task task = tasks.get(index);
+            String taskName = task.getName();
+            if (taskHandler.markTaskDone(task.getId())) {
+                TaskPrinter.printTaskDone(taskName);
                 return;
             }
-            TaskPrinter.printTaskDoneAlready(task);
-
-
+            TaskPrinter.printTaskDoneAlready(taskName);
         } catch (NumberFormatException e) {
             TaskPrinter.printNumberFormatExceptionError();
+        } catch (SQLException e) {
+            TaskPrinter.printTaskDoneDatabaseError();
         }
-
-
     }
 
     private <T> T readInputFromUser(Function<String, T> parser, Predicate<RuntimeException> invalidInput, Runnable errorPrint) {
@@ -143,9 +169,7 @@ public class TaskManager {
                     continue;
                 }
                 throw e;
-
             }
         }
     }
-
 }
