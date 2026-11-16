@@ -17,7 +17,13 @@ public class InMemoryTaskHandler implements TaskHandler {
 
     @Override
     public Task addTask(String name, String description, Priority priority, LocalDate deadline) {
-        Task task = new Task(idCounter, name, description, priority, deadline);
+        Task task = Task.builder()
+                .id(idCounter)
+                .name(name)
+                .description(description)
+                .priority(priority)
+                .deadline(deadline)
+                .build();
         tasks.add(task);
         idCounter++;
         return task;

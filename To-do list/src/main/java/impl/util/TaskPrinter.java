@@ -128,4 +128,12 @@ public final class TaskPrinter {
     public static void printTaskDoneDatabaseError() {
         System.out.println("Не удалось изменить статус задачи. Проверьте подключение к базе данных.");
     }
+
+    public static void printTaskInputError() {
+        System.out.println("Название и описание задачи не могут быть пустыми!");
+    }
+
+    public static void printUserNameInputError() {
+        System.out.println("Имя пользователя не может быть пустым!");
+    }
 }

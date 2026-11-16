@@ -1,5 +1,7 @@
 package impl.service;
 
+import lombok.RequiredArgsConstructor;
+
 import impl.model.Task;
 import impl.util.TaskPrinter;
 import impl.model.Priority;
@@ -13,9 +15,10 @@ import java.util.stream.IntStream;
 import java.sql.SQLException;
 import java.util.List;
 
+@RequiredArgsConstructor
 public class TaskManager {
-    private final Scanner scanner;
     private final TaskHandler taskHandler;
+    private final Scanner scanner;
 
     public TaskManager() {
         this(new InMemoryTaskHandler(), new Scanner(System.in));
@@ -23,11 +26,6 @@ public class TaskManager {
 
     public TaskManager(TaskHandler taskHandler) {
         this(taskHandler, new Scanner(System.in));
-    }
-
-    public TaskManager(TaskHandler taskHandler, Scanner scanner) {
-        this.taskHandler = taskHandler;
-        this.scanner = scanner;
     }
 
     public void start() {
@@ -85,6 +83,10 @@ public class TaskManager {
         String description = scanner.nextLine();
 
         try {
+            if (task.isBlank() || description.isBlank()) {
+                TaskPrinter.printTaskInputError();
+                return;
+            }
             taskHandler.addTask(task, description, priorityEnum, deadline);
             TaskPrinter.printTaskAddition();
         } catch (SQLException e) {

@@ -13,6 +13,7 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws SQLException {
+
         Scanner scanner = new Scanner(System.in);
         TaskPrinter.printStorageStrategyChoice();
         String strategy = scanner.nextLine();
@@ -22,6 +23,12 @@ public class Main {
             case "2" -> {
                 TaskPrinter.printUserName();
                 String userName = scanner.nextLine();
+
+                if (userName.isBlank()) {
+                    TaskPrinter.printUserNameInputError();
+                    return;
+                }
+                userName = userName.strip();
                 UserService userService = new UserService();
                 User user = userService.findUserByName(userName);
                 if (user == null) {

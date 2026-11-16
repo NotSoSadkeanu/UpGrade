@@ -1,65 +1,42 @@
 package impl.model;
 
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+
 import java.time.LocalDate;
 
+
+@Getter
 public class Task {
     private final int id;
+
+    @NonNull
     private String name;
+
+    @NonNull
+    @Setter
     private String description;
+
+    @NonNull
+    @Setter
     private Priority priority;
+
+    @NonNull
+    @Setter
     private LocalDate deadline;
+
+    @Setter
     private boolean done;
 
-    public Task(int id, String name, String description, Priority priority, LocalDate deadline) {
+    @Builder
+    public Task(int id, @NonNull String name, @NonNull String description, @NonNull Priority priority, @NonNull LocalDate deadline) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.priority = priority;
         this.deadline = deadline;
-    }
-
-    public Priority getPriority() {
-        return priority;
-    }
-
-    public void setPriority(Priority priority) {
-        this.priority = priority;
-    }
-
-    public LocalDate getDeadline() {
-        return deadline;
-    }
-
-    public void setDeadline(LocalDate deadline) {
-        this.deadline = deadline;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public boolean isDone() {
-        return done;
-    }
-
-    public void setDone(boolean done) {
-        this.done = done;
     }
 
 }
